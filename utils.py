@@ -1,6 +1,4 @@
-
 import matplotlib.pyplot as plt
-from matplotlib import cm
 import numpy as np
 
 def visualize_terrain(terrain, cmap='terrain'):
@@ -14,8 +12,8 @@ def visualize_terrain(terrain, cmap='terrain'):
     fig, ax = plt.subplots(figsize=(8, 6))
     im = ax.imshow(terrain, cmap=cmap, vmin=0, vmax=1)
     ax.set_title('Random Terrain')
-    ax.set_xticks([])
-    ax.set_yticks([])
+    # ax.set_xticks([])
+    # ax.set_yticks([])
     fig.colorbar(im, ax=ax)
     plt.show()
 
