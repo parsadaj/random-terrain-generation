@@ -112,7 +112,7 @@ def bicubic_interpolation(x, y, g00, g10, g01, g11):
     
 #     return bl_terrain, bc_terrain
 
-
+# Value Noise
 def generate_random_terrain_value(size, lattice_size, random_seed=43):
     """
     Generate a random terrain heightmap using interpolated noise.
@@ -159,7 +159,7 @@ def generate_random_terrain_value(size, lattice_size, random_seed=43):
     return bl_terrain, bc_terrain
 
 
-
+# Gradient Noise
 def generate_random_terrain_gradient(size, lattice_size, random_seed=43):
     """
     Generate a random terrain heightmap using gradient noise (Perlin noise).
@@ -237,3 +237,77 @@ def generate_fractal_terrain(size, lattice_size, noise_fn, base_freq, num_octave
         freq *= 2
     
     return terrain_bl, terrain_bc
+
+
+# Perlin noise
+def GetConstantVector(p_value):
+	# v is the value from the permutation table
+    h = p_value & 3
+    if (h == 0):
+        return np.array([1.0, 1.0])
+    elif (h == 1):
+        return np.array([-1.0, 1.0])
+    elif (h == 2):
+        return np.array([-1.0, -1.0])
+    else:
+        return np.array([1.0, -1.0])
+
+def Lerp(t, a1, a2):
+	return a1 + t*(a2-a1)
+
+def Fade(t):
+	return ((6*t - 15)*t + 10)*t*t*t
+
+
+def get_perlin_noise(x, y, random_seed):
+
+    xf = x - np.floor(x)
+    yf = y - np.floor(y)
+
+    topRight = np.array([xf-1.0, yf-1.0])
+    topLeft = np.array([xf, yf-1.0])
+    bottomRight = np.array([xf-1.0, yf])
+    bottomLeft = np.array([xf, yf])
+
+    # Create an array (our permutation table) with the values 0 to 255 in order and shuffle it
+    w = 256
+    permutation = np.arange(w)
+    np.random.seed(random_seed)
+    np.random.shuffle(permutation)
+    permutation = np.concatenate([permutation, permutation])
+
+        # Select a value in the array for each of the 4 corners
+    X = int(np.floor(x) % w)
+    Y = int(np.floor(y) % w)
+
+    valueTopRight = permutation[permutation[X+1]+Y+1]
+    valueTopLeft = permutation[permutation[X]+Y+1]
+    valueBottomRight = permutation[permutation[X+1]+Y]
+    valueBottomLeft = permutation[permutation[X]+Y]
+    
+    dotTopRight = topRight.dot(GetConstantVector(valueTopRight))
+    dotTopLeft = topLeft.dot(GetConstantVector(valueTopLeft))
+    dotBottomRight = bottomRight.dot(GetConstantVector(valueBottomRight))
+    dotBottomLeft = bottomLeft.dot(GetConstantVector(valueBottomLeft))
+
+    u = Fade(xf)
+    v = Fade(yf)
+    result = Lerp(u,
+        Lerp(v, dotBottomLeft, dotTopLeft),
+        Lerp(v, dotBottomRight, dotTopRight))
+    return result
+
+def FractalBrownianMotion(x, y, initial_freq, numOctaves, random_seed):
+    result = 0.0
+    amplitude = 1.0
+
+    for octave in range(0, numOctaves):
+        n = amplitude * get_perlin_noise(x * initial_freq, y * initial_freq, random_seed + octave);
+        result += n
+
+        amplitude *= 0.5
+        initial_freq *= 2.0
+
+    return result
+
+

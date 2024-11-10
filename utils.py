@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def visualize_terrain(terrain, cmap='terrain'):
+def visualize_terrain(terrain, cmap='terrain', title="Random"):
     """
     Visualize the terrain heightmap using matplotlib.
     
@@ -11,7 +11,7 @@ def visualize_terrain(terrain, cmap='terrain'):
     """
     fig, ax = plt.subplots(figsize=(8, 6))
     im = ax.imshow(terrain, cmap=cmap, vmin=0, vmax=1)
-    ax.set_title('Random Terrain')
+    ax.set_title(f'{title} Noise')
     # ax.set_xticks([])
     # ax.set_yticks([])
     fig.colorbar(im, ax=ax)
@@ -19,7 +19,7 @@ def visualize_terrain(terrain, cmap='terrain'):
 
 
 
-def visualize_3d_terrain(terrain, cmap='terrain', elev=45, azim=45):
+def visualize_3d_terrain(terrain, cmap='terrain', elev=45, azim=45, title="Random"):
     """
     Visualize the terrain heightmap in 3D using matplotlib.
     
@@ -38,5 +38,7 @@ def visualize_3d_terrain(terrain, cmap='terrain', elev=45, azim=45):
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Elevation')
+    ax.set_title(f'{title} Terrain')
+
     ax.view_init(elev=elev, azim=azim)
     plt.show()
